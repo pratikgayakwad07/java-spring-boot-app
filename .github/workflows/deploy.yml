@@ -19,25 +19,30 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build with Maven
-      run: mvn clean package
+     - name: Build
+      run: mvn clean package -DskipTests
+      shell: bash
 
-    - name: Copy JAR to EC2
-      uses: appleboy/scp-action@v0.1.4
+    - name: Copy JAR
+      uses: appleboy/scp-action@v0.1.7
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
+        host: ${{ inputs.host }}
+        username: ${{ inputs.user }}
+        key: ${{ inputs.key }}
         source: "target/*.jar"
-        target: "/home/ubuntu/"
+        target: "/home/${{ inputs.user }}/app"
+        strip_components: 1
 
-    - name: Deploy on EC2
-      uses: appleboy/ssh-action@v0.1.5
+    - name: Restart App
+      uses: appleboy/ssh-action@v0.1.10
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
+        host: ${{ inputs.host }}
+        username: ${{ inputs.user }}
+        key: ${{ inputs.key }}
         script: |
-          pkill -f 'java -jar' || true
-          nohup java -jar /home/ubuntu/target/*.jar > app.log 2>&1 &
+          fuser -k 8080/tcp || true
+          nohup java -jar /home/${{ inputs.user }}/app/*.jar > app.log 2>&1 &
+
+
+          
         

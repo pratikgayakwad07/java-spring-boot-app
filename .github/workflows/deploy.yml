@@ -1,4 +1,4 @@
-name: CI-CD Spring Boot EC2 Deploy
+name: CI-CD Spring Boot to EC2
 
 on:
   push:
@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
 
-    - name: Set up Java
-      uses: actions/setup-java@v4
+    - name: Setup Java
+      uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '17'
@@ -23,10 +23,21 @@ jobs:
       run: mvn clean package
 
     - name: Copy JAR to EC2
-      uses: appleboy/scp-action@v0.1.7
+      uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "target/*.jar"
         target: "/home/ubuntu/app"
+
+    - name: Deploy on EC2
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          pkill -f 'java -jar' || true
+          cd /home/ubuntu/app
+          nohup java -jar *.jar > app.log 2>&1 &

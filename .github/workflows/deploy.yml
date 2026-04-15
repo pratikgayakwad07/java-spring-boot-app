@@ -19,7 +19,7 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-     - name: Build
+    - name: Build
       run: mvn clean package -DskipTests
       shell: bash
 
@@ -43,6 +43,3 @@ jobs:
           fuser -k 8080/tcp || true
           nohup java -jar /home/${{ inputs.user }}/app/*.jar > app.log 2>&1 &
 
-
-          
-        

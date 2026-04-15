@@ -26,20 +26,20 @@ jobs:
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
+        username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "target/*.jar"
-        target: "/home/${{ secrets.EC2_USERNAME }}/app"
+        target: "/home/${{ secrets.EC2_USER }}/app"
         strip_components: 1
 
     - name: Restart Application
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
+        username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           # Kill the old process running on 8080
           sudo fuser -k 8080/tcp || true
           # Run the new JAR in the background
-          nohup java -jar /home/${{ secrets.EC2_USERNAME }}/app/*.jar > app.log 2>&1 &
+          nohup java -jar /home/${{ secrets.EC2_USER }}/app/*.jar > app.log 2>&1 &

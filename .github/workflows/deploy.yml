@@ -38,6 +38,5 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          pkill -f 'java -jar' || true
           cd /home/ubuntu/app
           nohup java -jar *.jar > app.log 2>&1 &

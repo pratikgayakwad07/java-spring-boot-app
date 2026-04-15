@@ -29,7 +29,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "target/*.jar"
-        target: "/home/${{ inputs.user }}/app"
+        target: "/home/ubuntu/app"
 
     - name: Deploy on EC2
       uses: appleboy/ssh-action@v0.1.5
@@ -38,5 +38,6 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          cd /home/${{ inputs.user }}/app
+          pkill -f 'java -jar' || true
+          cd /home/ubuntu/app
           nohup java -jar *.jar > app.log 2>&1 &

@@ -29,7 +29,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: target/*.jar
-          target: /home/ubuntu/
+          target: /home/ubuntu/app/
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.6
@@ -38,14 +38,18 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "Stopping old app..."
-            pkill -f 'java -jar' || true
-            sleep 2
+            echo "Stopping old app safely..."
+
+            PID=$(pgrep -f "java -jar")
+            if [ -n "$PID" ]; then
+            kill -15 $PID
+            sleep 3
+            fi
 
             echo "Starting new app..."
-            cd /home/ubuntu/
 
-            nohup java -jar target/*.jar > app.log 2>&1 < /dev/null &
-            disown
+            cd /home/ubuntu/app
+
+            nohup java -jar *.jar > app.log 2>&1 < /dev/null &
 
            

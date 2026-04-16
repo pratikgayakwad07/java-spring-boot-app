@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       # Calling your external composite action
       - name: Run Spring Deploy Action
-        uses: pratikgayakwad07/Composite-Action--Springboot/.github/actions/deploy-composite@main
+        uses: pratikgayakwad07/Composite-Action--Springboot/.github/actions/springboot-deploy@main
         with:
           host: ${{ secrets.EC2_HOST }}
           user: ${{ secrets.EC2_USER }}
